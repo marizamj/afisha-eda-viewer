@@ -4,7 +4,8 @@
   "description": "",
   "main": "eda.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "precommit": "npm test"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +14,7 @@
     "request": "^2.74.0"
   },
   "devDependencies": {
+    "husky": "^0.11.6",
     "mocha": "^3.0.2"
   }
 }
