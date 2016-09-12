@@ -5,16 +5,25 @@
   "main": "eda.js",
   "scripts": {
     "test": "mocha",
-    "precommit": "npm test"
+    "precommit": "npm test",
+    "build": "webpack",
+    "watch": "webpack --watch --verbose"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "backbone": "^1.3.3",
     "cheerio": "^0.22.0",
+    "express": "^4.14.0",
+    "jquery": "^3.1.0",
     "request": "^2.74.0"
   },
   "devDependencies": {
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.14.0",
     "husky": "^0.11.6",
-    "mocha": "^3.0.2"
+    "mocha": "^3.0.2",
+    "webpack": "^1.13.2"
   }
 }
