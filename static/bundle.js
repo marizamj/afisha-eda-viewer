@@ -52,55 +52,19 @@
 	var RecipeView = __webpack_require__(5);
 	var Recipes = __webpack_require__(6);
 	var RecipesView = __webpack_require__(7);
+	var RecipesContainer = __webpack_require__(8);
+	var RecipesContainerView = __webpack_require__(9);
 
-	var page = 1;
-
-	function load(page) {
-		fetch('/loadRecipes?page=' + page).then(function (response) {
-			return response.json();
-		}).then(function (json) {
-			var recipes = new Recipes(json);
-
-			var div = document.createElement('div');
-			div.classList.add('recipes-wrapper');
-			div.innerHTML = 'Loading...';
-			document.body.appendChild(div);
-			var recipesView = new RecipesView({
-				collection: recipes,
-				el: div
-			}).render();
-
-			var loadingDiv = document.querySelector('.loading');
-
-			if (loadingDiv) {
-				loadingDiv.remove();
-			}
-		});
-	}
-
-	document.addEventListener('scroll', function (event) {
-		var recipesWrapper = document.querySelector('.recipes-wrapper');
-		var recipesScrollHeight = recipesWrapper.scrollHeight;
-		var recipesScrollTop = recipesWrapper.scrollTop;
-		var recipesClientHeight = recipesWrapper.clientHeight;
-
-		if (recipesScrollHeight - recipesScrollTop === recipesClientHeight) {
-
-			// if (!document.querySelector('.loading')) {
-			// 	page += 1;
-			// 	const loading = document.createElement('div');
-			// 	loading.classList.add('loading');
-			// 	loading.innerHTML = 'Loading...';
-			// 	document.body.appendChild(loading);
-			// 	load(page);
-			// console.log(page);
-			// }
-
-
-		}
+	var recipesContainer = new RecipesContainer({
+		recipes: new Recipes([])
 	});
 
-	load(page);
+	var recipesContainerView = new RecipesContainerView({
+		el: document.body,
+		model: recipesContainer
+	});
+
+	recipesContainerView.render();
 
 /***/ },
 /* 1 */
@@ -13698,7 +13662,19 @@
 	var Recipe = __webpack_require__(4);
 
 	var Recipes = Backbone.Collection.extend({
-		model: Recipe
+		model: Recipe,
+
+		loadNext: function loadNext(page) {
+			var _this = this;
+
+			this.trigger('loading');
+
+			fetch('/loadRecipes?page=' + page).then(function (response) {
+				return response.json();
+			}).then(function (json) {
+				_this.add(json);
+			});
+		}
 	});
 
 	module.exports = Recipes;
@@ -13712,8 +13688,23 @@
 	var RecipeView = __webpack_require__(5);
 
 	var RecipesView = Backbone.View.extend({
-		render: function render() {
+		className: 'recipes-container',
+
+		initialize: function initialize() {
 			var _this = this;
+
+			this.listenTo(this.collection, 'update', this.render.bind(this));
+
+			this.listenTo(this.collection, 'loading', function () {
+				var div = document.createElement('div');
+				div.classList.add('loading');
+				div.innerHTML = 'Loading more... <img src="bakercat.gif" width="200px" />';
+				_this.el.appendChild(div);
+			});
+		},
+
+		render: function render() {
+			var _this2 = this;
 
 			this.el.innerHTML = '';
 
@@ -13721,15 +13712,86 @@
 				this.collection.models.forEach(function (recipe) {
 					var recipeView = new RecipeView({ model: recipe });
 
-					_this.el.appendChild(recipeView.render().el);
+					_this2.el.appendChild(recipeView.render().el);
 				});
 			}
+			return this;
+		},
+
+		events: {
+			'scroll': 'scroll'
+		},
+
+		scroll: function scroll() {
+			var recipesScrollHeight = this.el.scrollHeight;
+			var recipesScrollTop = this.el.scrollTop;
+			var recipesClientHeight = this.el.clientHeight;
+
+			if (recipesScrollHeight - recipesScrollTop === recipesClientHeight) {
+				this.collection.trigger('bottomReached');
+			}
+		}
+	});
+
+	module.exports = RecipesView;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var RecipesContainer = Backbone.Model.extend({
+		defaults: {
+			page: 1
+		},
+
+		initialize: function initialize() {
+			var _this = this;
+
+			var recipes = this.get('recipes');
+
+			recipes.loadNext(this.get('page'));
+
+			this.listenTo(recipes, 'bottomReached', function () {
+				_this.nextPage();
+			});
+
+			this.on('change:page', function () {
+				recipes.loadNext(_this.get('page'));
+			});
+		},
+
+		nextPage: function nextPage() {
+			this.set('page', this.get('page') + 1);
+		}
+	});
+
+	module.exports = RecipesContainer;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var RecipesView = __webpack_require__(7);
+
+	var RecipesContainerView = Backbone.View.extend({
+		render: function render() {
+			var recipes = this.model.get('recipes');
+
+			var recipesView = new RecipesView({
+				collection: recipes
+			});
+
+			this.el.appendChild(recipesView.render().el);
 
 			return this;
 		}
 	});
 
-	module.exports = RecipesView;
+	module.exports = RecipesContainerView;
 
 /***/ }
 /******/ ]);

@@ -3,12 +3,23 @@
 <head>
 	<title></title>
 	<style>
-		.recipes-wrapper {
+		.recipes-container {
 			border: 1px solid black;
 			width: 300px;
 			height: 650px;
 			text-align: center;
 			overflow: scroll;
+			position: relative;
+			background: #fef2e6;
+		}
+
+		.loading {
+			position: absolute;
+			font-size: 22px;
+			color: #b5a89f;
+			right: 0;
+			left: 0;
+			z-index: 100;
 		}
 	</style>
 </head>
