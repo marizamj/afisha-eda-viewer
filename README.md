@@ -1,5 +1,9 @@
 ### afisha-eda-viewer
 
-`npm install`
-`npm start`
-`npm run watch`
+```bash
+npm install
+
+npm run watch
+
+npm start
+```
