@@ -9,7 +9,7 @@ const RecipesView = Backbone.View.extend({
 		this.listenTo(this.collection, 'loading', () => {
 			const div = document.createElement('div');
 			div.classList.add('loading');
-			div.innerHTML = 'Loading more... <img src="bakercat.gif" width="200px" />';
+			div.innerHTML = 'Loading more... <img src="images/bakercat.gif" width="200px" />';
 			this.el.appendChild(div);
 		});
 	},

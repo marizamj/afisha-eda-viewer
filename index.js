@@ -1,6 +1,7 @@
 const express = require('express');
 
-const loadRecipes = require('./loadRecipes');
+const eda = require('afisha-eda');
+const loadRecipes = eda.loadRecipes;
 
 const app = express();
 
